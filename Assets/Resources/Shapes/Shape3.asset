@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399bb4934acf47041bab8b3964ed243f, type: 3}
   m_Name: Shape3
   m_EditorClassIdentifier: 
-  columns: 0
-  rows: 0
-  board: []
+  columns: 1
+  rows: 3
+  board:
+  - column: 01
+  - column: 01
+  - column: 01
