@@ -6,7 +6,7 @@ public class Shape : MonoBehaviour
 {
     public GameObject squareShapeImage;
 
-    //[HideInInspector]
+    [HideInInspector]
     public ShapeData CurrentShapeData;
 
     private List<GameObject> _currentShapes = new List<GameObject>();
@@ -14,7 +14,6 @@ public class Shape : MonoBehaviour
 
     void Start()
     {
-        RequestNewShape(CurrentShapeData);
     }
 
     public void RequestNewShape(ShapeData shapeData)
