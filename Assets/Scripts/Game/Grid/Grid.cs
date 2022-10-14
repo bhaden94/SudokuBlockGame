@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Grid : MonoBehaviour
@@ -24,6 +25,16 @@ public class Grid : MonoBehaviour
     {
         SpawnGridSquares();
         SetGridSquarePositions();
+    }
+
+    private void OnEnable()
+    {
+        GameEvents.CheckIfShapeCanBePlaced += CheckIfShapeCanBePlaced;
+    }
+
+    private void OnDisable()
+    {
+        GameEvents.CheckIfShapeCanBePlaced -= CheckIfShapeCanBePlaced;
     }
 
     private void SpawnGridSquares()
@@ -90,5 +101,18 @@ public class Grid : MonoBehaviour
             columnNum++;
         }
 
+    }
+
+    private void CheckIfShapeCanBePlaced()
+    {
+        foreach (var square in _gridSqaures)
+        {
+            var gridSquare = square.GetComponent<GridSquare>();
+
+            if (gridSquare.CaneUsethisSquare())
+            {
+                gridSquare.ActivateSquare();
+            }
+        }
     }
 }
