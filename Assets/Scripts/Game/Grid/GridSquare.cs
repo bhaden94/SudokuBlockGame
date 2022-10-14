@@ -22,6 +22,11 @@ public class GridSquare : MonoBehaviour
         SquareOccupied = false;
     }
 
+    public void PlaceShapeOnBoard()
+    {
+        ActivateSquare();
+    }
+
     // temp function. 
     public bool CaneUsethisSquare()
     {
@@ -43,16 +48,29 @@ public class GridSquare : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        hoverImage.gameObject.SetActive(true);
+        if (!SquareOccupied)
+        {
+            Selected = true;
+            hoverImage.gameObject.SetActive(true);
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        hoverImage.gameObject.SetActive(false);
+        if (!SquareOccupied)
+        {
+            Selected = false;
+            hoverImage.gameObject.SetActive(false);
+        }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        hoverImage.gameObject.SetActive(true);
+        Selected = true;
+
+        if (!SquareOccupied)
+        {
+            hoverImage.gameObject.SetActive(true);
+        }
     }
 }

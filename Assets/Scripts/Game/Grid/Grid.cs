@@ -50,6 +50,8 @@ public class Grid : MonoBehaviour
             for (var col = 0; col < columns; col++)
             {
                 _gridSqaures.Add(Instantiate(gridSquare) as GameObject);
+
+                _gridSqaures[_gridSqaures.Count - 1].GetComponent<GridSquare>().SquareIndex = squareIndex;
                 _gridSqaures[_gridSqaures.Count - 1].transform.SetParent(this.transform);
                 _gridSqaures[_gridSqaures.Count - 1].transform.localScale = new Vector3(squareScale, squareScale, squareScale);
                 _gridSqaures[_gridSqaures.Count - 1].GetComponent<GridSquare>().SetImage(squareIndex % 2 == 0);
@@ -106,16 +108,34 @@ public class Grid : MonoBehaviour
 
     private void CheckIfShapeCanBePlaced()
     {
+        var squareIndexes = new List<int>();
         foreach (var square in _gridSqaures)
         {
             var gridSquare = square.GetComponent<GridSquare>();
 
-            if (gridSquare.CaneUsethisSquare())
+            if (gridSquare.Selected && !gridSquare.SquareOccupied)
             {
-                gridSquare.ActivateSquare();
+                //gridSquare.ActivateSquare();
+                squareIndexes.Add(gridSquare.SquareIndex);
+                gridSquare.Selected = false;
             }
         }
 
-        shapeStorage.GetCurrentSelectedShape().DeactivateShape();
+        var currentSelectedShape = shapeStorage.GetCurrentSelectedShape();
+        if (currentSelectedShape == null) return; // there is no selected shape
+
+        if (currentSelectedShape.TotalSquareNumber == squareIndexes.Count)
+        {
+            foreach (var i in squareIndexes)
+            {
+                _gridSqaures[i].GetComponent<GridSquare>().PlaceShapeOnBoard();
+            }
+
+            currentSelectedShape.DeactivateShape();
+        }
+        else
+        {
+            GameEvents.MoveShapeToStartPosition();
+        }
     }
 }
