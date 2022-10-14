@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Grid : MonoBehaviour
 {
+    public ShapeStorage shapeStorage;
     public int columns = 0;
     public int rows = 0;
     public float squareGaps = 0.1f;
@@ -114,5 +115,7 @@ public class Grid : MonoBehaviour
                 gridSquare.ActivateSquare();
             }
         }
+
+        shapeStorage.GetCurrentSelectedShape().DeactivateShape();
     }
 }

@@ -17,6 +17,8 @@ public class Shape : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, I
     private RectTransform _transform;
     private bool _shapeDraggable = true;
     private Canvas _canvas;
+    private Vector3 _startPosition;
+    private bool _shapeActive = true;
 
     public void Awake()
     {
@@ -24,11 +26,57 @@ public class Shape : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, I
         _transform = this.GetComponent<RectTransform>();
         _canvas = this.GetComponentInParent<Canvas>();
         _shapeDraggable = true;
+        _startPosition = _transform.localPosition;
+        _shapeActive = true;
     }
 
+    public bool IsOnStartPosition()
+    {
+        return _transform.localPosition == _startPosition;
+    }
+
+    public bool IsAnyOfShapeSquareActive()
+    {
+        foreach (var shape in _currentShapes)
+        {
+            if (shape.gameObject.activeSelf)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void DeactivateShape()
+    {
+        if (_shapeActive)
+        {
+            foreach (var shape in _currentShapes)
+            {
+                shape?.GetComponent<ShapeSquare>().DeactivateShape();
+            }
+        }
+
+        _shapeActive = false;
+    }
+
+    public void ActivateShape()
+    {
+        if (!_shapeActive)
+        {
+            foreach (var shape in _currentShapes)
+            {
+                shape?.GetComponent<ShapeSquare>().ActivateShape();
+            }
+        }
+
+        _shapeActive = true;
+    }
 
     public void RequestNewShape(ShapeData shapeData)
     {
+        _transform.localPosition = _startPosition;
         CreateShape(shapeData);
     }
 
@@ -58,7 +106,7 @@ public class Shape : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, I
         // set position to form final shape
         for (var row = 0; row < shapeData.rows; row++)
         {
-            for(var col = 0; col< shapeData.columns; col++)
+            for (var col = 0; col < shapeData.columns; col++)
             {
                 if (shapeData.board[row].column[col])
                 {
