@@ -44,7 +44,7 @@ public class Grid : MonoBehaviour
         // 5, 6, 7, 8, 9
 
         int squareIndex = 0;
-        
+
         for (var row = 0; row < rows; row++)
         {
             for (var col = 0; col < columns; col++)
@@ -131,7 +131,25 @@ public class Grid : MonoBehaviour
                 _gridSqaures[i].GetComponent<GridSquare>().PlaceShapeOnBoard();
             }
 
-            currentSelectedShape.DeactivateShape();
+            var shapeLeft = 0;
+
+            foreach (var shape in shapeStorage.shapeList)
+            {
+                if (shape.IsOnStartPosition() && shape.IsAnyOfShapeSquareActive())
+                {
+                    shapeLeft++;
+                }
+            }
+
+            if (shapeLeft == 0)
+            {
+                GameEvents.RequestNewShapes();
+            }
+            else
+            {
+                GameEvents.SetShapeInactive();
+            }
+
         }
         else
         {
