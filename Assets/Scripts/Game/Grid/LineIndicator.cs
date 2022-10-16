@@ -5,7 +5,7 @@ using UnityEngine;
 public class LineIndicator : MonoBehaviour
 {
     // thsi lays out the grid indexes for each square
-    public int[,] lineData = new int[9, 9]
+    public readonly int[,] lineData = new int[9, 9]
     {
         { 0, 1, 2,   3, 4, 5,   6, 7, 8 },
         { 9,10,11,  12,13,14,  15,16,17 },
@@ -21,7 +21,7 @@ public class LineIndicator : MonoBehaviour
     };
 
     // this holds the indexes for each nested square in the grid
-    public int[,] squareData = new int[9, 9]
+    public readonly int[,] squareData = new int[9, 9]
     {
         { 0, 1, 2, 9, 10, 11, 18, 19, 20 },
         { 3, 4, 5, 12, 13, 14, 21, 22, 23 },
@@ -33,6 +33,46 @@ public class LineIndicator : MonoBehaviour
         { 57, 58, 59, 66, 67, 68, 75, 76, 77 },
         { 60, 61, 62, 69, 70, 71, 78, 79, 80 }
     };
+
+    [HideInInspector]
+    public readonly int[] columnIndexes = new int[9]
+    {
+        0, 1, 2, 3, 4, 5, 6, 7, 8
+    };
+
+    private (int, int) GetSquarePosition(int squareIndex)
+    {
+        int positionRow = -1;
+        int positionCol = -1;
+
+        for(int row = 0; row<9; row++)
+        {
+            for(int col = 0; col<9; col++)
+            {
+                if (lineData[row, col] == squareIndex)
+                {
+                    positionRow = row;
+                    positionCol = col;
+                }
+            }
+        }
+
+        return (positionRow, positionCol);
+    }
+
+    public int[] GetVerticalLine(int squareIndex)
+    {
+        int[] line = new int[9];
+
+        var squarePosColumn = GetSquarePosition(squareIndex).Item2;
+
+        for (int i = 0; i<9; i++)
+        {
+            line[i] = lineData[i, squarePosColumn];
+        }
+
+        return line;
+    }
 
     public int GetGridSquareIndex(int square)
     {
