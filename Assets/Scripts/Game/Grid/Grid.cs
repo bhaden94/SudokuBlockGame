@@ -16,9 +16,11 @@ public class Grid : MonoBehaviour
 
     private Vector2 _offset = new Vector2(0.0f, 0.0f);
     private List<GameObject> _gridSqaures = new List<GameObject>();
+    private LineIndicator _lineIndicator;
 
     void Start()
     {
+        _lineIndicator = GetComponent<LineIndicator>();
         CreateGrid();
     }
 
@@ -54,7 +56,7 @@ public class Grid : MonoBehaviour
                 _gridSqaures[_gridSqaures.Count - 1].GetComponent<GridSquare>().SquareIndex = squareIndex;
                 _gridSqaures[_gridSqaures.Count - 1].transform.SetParent(this.transform);
                 _gridSqaures[_gridSqaures.Count - 1].transform.localScale = new Vector3(squareScale, squareScale, squareScale);
-                _gridSqaures[_gridSqaures.Count - 1].GetComponent<GridSquare>().SetImage(squareIndex % 2 == 0);
+                _gridSqaures[_gridSqaures.Count - 1].GetComponent<GridSquare>().SetImage(_lineIndicator.GetGridSquareIndex(squareIndex) % 2 == 0);
                 squareIndex++;
             }
         }
