@@ -183,6 +183,18 @@ public class Grid : MonoBehaviour
             lines.Add(data.ToArray());
         }
 
+        // loop through nested squares
+        for (var square = 0; square < 9; square++)
+        {
+            List<int> data = new List<int>(9);
+            for (var i = 0; i < 9; i++)
+            {
+                data.Add(_lineIndicator.squareData[square, i]);
+            }
+
+            lines.Add(data.ToArray());
+        }
+
         var completedLines = CheckIfSquaresAreCompleted(lines);
 
         if (completedLines > 2)
@@ -190,7 +202,8 @@ public class Grid : MonoBehaviour
             //TODO: play bonus animation
         }
 
-        // TODO: add scores.
+        var totalScores = 10 * completedLines;
+        GameEvents.AddScores(totalScores);
     }
 
     private int CheckIfSquaresAreCompleted(List<int[]> data)
