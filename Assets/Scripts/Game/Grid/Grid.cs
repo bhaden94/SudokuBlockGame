@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Unity.VisualScripting;
 using UnityEngine;
+using static ShapeData;
+using Debug = UnityEngine.Debug;
 
 public class Grid : MonoBehaviour
 {
@@ -204,6 +206,7 @@ public class Grid : MonoBehaviour
 
         var totalScores = 10 * completedLines;
         GameEvents.AddScores(totalScores);
+        CheckIfPlayerLost();
     }
 
     private int CheckIfSquaresAreCompleted(List<int[]> data)
@@ -253,5 +256,119 @@ public class Grid : MonoBehaviour
         }
 
         return linesCompleted;
+    }
+
+    private void CheckIfPlayerLost()
+    {
+        var validShapes = 0;
+
+        for (var i = 0; i < shapeStorage.shapeList.Count; i++)
+        {
+            var isShapeActive = shapeStorage.shapeList[i].IsAnyOfShapeSquareActive();
+            if (CheckIfShapeCanBePlacedOnGrid(shapeStorage.shapeList[i]) && isShapeActive)
+            {
+                shapeStorage.shapeList[i]?.ActivateShape();
+                validShapes++;
+            }
+        }
+
+        if (validShapes == 0)
+        {
+            // game over
+            // GameEvents.GameOver(false);
+            Debug.Log("GAME OVER");
+        }
+    }
+
+    private bool CheckIfShapeCanBePlacedOnGrid(Shape currentShape)
+    {
+        var currentShapeData = currentShape.CurrentShapeData;
+        var shapeColumns = currentShapeData.columns;
+        var shapeRows = currentShapeData.rows;
+
+        // all indexes of filled up squares
+        List<int> originalShapeFilledSqures = new List<int>();
+        var squareIndex = 0;
+
+        for (var row = 0; row < shapeRows; row++)
+        {
+            for (var col = 0; col < shapeColumns; col++)
+            {
+                if (currentShapeData.board[row].column[col])
+                {
+                    originalShapeFilledSqures.Add(squareIndex);
+                }
+
+                squareIndex++;
+            }
+        }
+
+        if (currentShape.TotalSquareNumber != originalShapeFilledSqures.Count)
+        {
+            Debug.LogError("Number of filled up squares are not the same as the original shape has.");
+        }
+
+        var squareList = GetAllSquaresCombination(shapeColumns, shapeRows);
+
+        bool canBePlaced = false;
+
+        foreach (var number in squareList)
+        {
+            bool shapeCanBePlacedOnBoard = true;
+            foreach (var squareIndexToCheck in originalShapeFilledSqures)
+            {
+                var comp = _gridSqaures[number[squareIndexToCheck]].GetComponent<GridSquare>();
+                if (comp.SquareOccupied)
+                {
+                    shapeCanBePlacedOnBoard = false;
+                }
+            }
+
+            if (shapeCanBePlacedOnBoard)
+            {
+                canBePlaced = true;
+            }
+        }
+
+        return canBePlaced;
+    }
+
+    private List<int[]> GetAllSquaresCombination(int cols, int rows)
+    {
+        var squareList = new List<int[]>();
+        var lastColIndex = 0;
+        var lastRowIndex = 0;
+
+        int safeIndex = 0;
+
+        while (lastRowIndex + (rows - 1) < 9)
+        {
+            var rowData = new List<int>();
+
+            for (var row = lastRowIndex; row < lastRowIndex + rows; row++)
+            {
+                for (var col = lastColIndex; col < lastColIndex + cols; col++)
+                {
+                    rowData.Add(_lineIndicator.lineData[row, col]);
+                }
+            }
+
+            squareList.Add(rowData.ToArray());
+            lastColIndex++;
+
+            // at the last column, go down one row and reset column
+            if (lastColIndex + (cols - 1) >= 9)
+            {
+                lastRowIndex++;
+                lastColIndex = 0;
+            }
+
+            // just in case conditions are never met, we break out so no infinite loops happen
+            safeIndex++;
+            if (safeIndex > 100)
+                break;
+        }
+
+        return squareList;
     }
 }
