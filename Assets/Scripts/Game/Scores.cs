@@ -32,7 +32,7 @@ public class Scores : MonoBehaviour
     {
         _bestScore = BinaryDataStream.Read<BestScoreData>(_bestScoreKey);
         yield return new WaitForEndOfFrame();
-        Debug.Log("Read best score: " + _bestScore.Score);
+        GameEvents.UpdateBestScoreBar(_currentScores, _bestScore.Score);
     }
 
     private void Start()
@@ -61,7 +61,10 @@ public class Scores : MonoBehaviour
         {
             _newBestScore = true;
             _bestScore.Score = _currentScores;
+            SaveBestScores(true);
         }
+
+        GameEvents.UpdateBestScoreBar(_currentScores, _bestScore.Score);
         UpdateScoreText();
     }
 
