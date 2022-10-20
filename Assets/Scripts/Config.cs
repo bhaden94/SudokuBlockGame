@@ -6,7 +6,7 @@ public class Config : MonoBehaviour
 {
     public enum SquareColor
     {
-        NoteSet,
+        NotSet,
         Red,
         Blue,
         Orange,

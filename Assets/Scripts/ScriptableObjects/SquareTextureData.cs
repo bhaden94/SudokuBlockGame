@@ -14,7 +14,7 @@ public class SquareTextureData : ScriptableObject
     }
     // used to switch to another color
     public int thresholdVal = 10;
-    private const int START_THRESHOLD_VALUE = 100;
+    private const int START_THRESHOLD_VALUE = 10;
     public List<TextureData> activeSquareTextures;
 
     public Config.SquareColor currentColor;
