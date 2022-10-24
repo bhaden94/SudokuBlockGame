@@ -23,6 +23,7 @@ public class Grid : MonoBehaviour
     private LineIndicator _lineIndicator;
 
     private Config.SquareColor _currentActiveSquareColor = Config.SquareColor.NotSet;
+    private List<Config.SquareColor> _colorsInGrid = new List<Config.SquareColor>();
 
     void Start()
     {
@@ -34,6 +35,26 @@ public class Grid : MonoBehaviour
     private void OnUpdateSquareColor(Config.SquareColor color)
     {
         _currentActiveSquareColor = color;
+    }
+
+    private List<Config.SquareColor> GetAllSquareColorsInGrid()
+    {
+        var colors = new List<Config.SquareColor>();
+
+        foreach (var square in _gridSqaures)
+        {
+            var gridSquare = square.GetComponent<GridSquare>();
+            if (gridSquare.SquareOccupied)
+            {
+                var color = gridSquare.GetCurrentColor();
+                if (!colors.Contains(color))
+                {
+                    colors.Add(color);
+                }
+            }
+        }
+
+        return colors;
     }
 
     private void CreateGrid()
@@ -208,6 +229,9 @@ public class Grid : MonoBehaviour
             lines.Add(data.ToArray());
         }
 
+        // This function needs to be called before CheckIfSquaresAreCompleted
+        _colorsInGrid = GetAllSquareColorsInGrid();
+
         var completedLines = CheckIfSquaresAreCompleted(lines);
 
         if (completedLines >= 2)
@@ -216,8 +240,29 @@ public class Grid : MonoBehaviour
         }
 
         var totalScores = 10 * completedLines;
-        GameEvents.AddScores(totalScores);
+        var bonusScores = ShouldPlayColorBonusAnimation();
+        GameEvents.AddScores(totalScores + bonusScores);
         CheckIfPlayerLost();
+    }
+
+    private int ShouldPlayColorBonusAnimation()
+    {
+        var colorsInTheGridAfterLineRemoved = GetAllSquareColorsInGrid();
+        List<Config.SquareColor> colorsToPlayBonusFor = new List<Config.SquareColor>();
+
+        foreach (var squareColor in _colorsInGrid)
+        {
+            if (!colorsInTheGridAfterLineRemoved.Contains(squareColor))
+            {
+                colorsToPlayBonusFor.Add(squareColor);
+            }
+        }
+
+        colorsToPlayBonusFor.Remove(_currentActiveSquareColor);
+        colorsToPlayBonusFor.Remove(Config.SquareColor.NotSet);
+        GameEvents.ShowBonusScreen(colorsToPlayBonusFor);
+
+        return colorsToPlayBonusFor.Count * 50;
     }
 
     private int CheckIfSquaresAreCompleted(List<int[]> data)
